@@ -4,4 +4,4 @@ See wiki here: https://github.com/Prometheus-X-association/docs/wiki/Prometheus%
 
 # Ariane components architecture diagram
 
-![Ariane Building Block Architecture Diagram](./PTX%20Ariane%20architecture.drawio.svg)
+![Ariane Building Block Architecture Diagram](./PTX%20Ariane%20+%20EDGE%20RAM.png)
