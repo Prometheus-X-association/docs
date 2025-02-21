@@ -1,0 +1,32 @@
+@startuml
+
+
+title Uploading Dataset
+
+rectangle Local {
+(prepare dataset) as pd
+(write metadata docs) as wmd
+}
+
+rectangle Platform {
+(upload) as u
+(configure access) as da
+}
+
+actor DataProvider as dp
+dp-->pd
+dp-->wmd
+dp-->u
+dp->da
+
+note bottom of pd : dataset is formated in xAPI standard.
+
+note bottom of  wmd : preferably, xAPI Profile standard link
+
+note "dedicated utility could be use for this purpose" as n1
+
+dp->n1
+n1->u
+
+
+@enduml
