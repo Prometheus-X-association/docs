@@ -1,0 +1,83 @@
+@startuml
+
+box "Data Consumer" #Orange
+    participant "TriggeringBB\n/w Connector" as TriggeringBB order 5
+end box
+box "Data and Function Providers" #LightGreen
+    database "Function\nProvider" as FunctionProvider order 10
+    participant ConnectorFP order 15
+    database "Data\nProvider" as DataProvider order 20
+    participant ConnectorDP order 25
+end box
+box "PTX Core" #LightGrey
+    participant Catalog order 30
+    participant Consent order 40
+    participant Contract order 50
+end box
+box "Edge Computing BB" #LightBlue
+    boundary EdgeAPI order 60
+    participant ConnectorEdge order 65
+    participant PrivacyZoneMgr order 70
+    control Scheduler order 80
+    participant ArtifactBuilder order 90
+    participant Wrapper order 100
+    participant WorkerNode order 110
+end box
+
+hnote over TriggeringBB, Contract: Gathering Contracts & Consent
+
+TriggeringBB -> EdgeAPI : requestEdgeProc(Function F, PrivateData PD, Contract Cd, Contract Cf, Consent Cons(F on PD), AccessToken T)
+EdgeAPI -> Catalog : getAccessInfo(PrivateData PD)
+Catalog -> EdgeAPI : ID of DataProvider, AccessInfo of its Connector
+
+== Gathering Privacy Zone Data == 
+EdgeAPI -> PrivacyZoneMgr : getPZData(DataProvider DP, \nPrivateData PD)
+PrivacyZoneMgr -> ConnectorEdge : getPZData(DataProvider DP, \nPrivateData PD)
+ConnectorEdge -> ConnectorDP : getPZData(DataProvider DP, PrivateData PD)
+ConnectorDP -> Contract : verify contracts (DataProvider, CloudProviders)\nget list of contracted CPs, other privacy constraints
+Contract -> ConnectorDP : OK, list of CPs and other privacy constraints
+ConnectorDP -> ConnectorEdge : PrivacyZoneData PZData (of DataProvider DP, PrivateData PD)
+ConnectorEdge -> PrivacyZoneMgr : PrivacyZoneData PZData
+PrivacyZoneMgr -> EdgeAPI : PrivacyZoneData PZData
+
+== Building and Deploying Artifact ==
+EdgeAPI -> Scheduler : requestEdgeProc(Function F, PrivateData PD,\nContract Cd, Contract Cf,\nConsent Cons(F on PD), AccessToken T, \nPrivacyZoneData PZData)
+Scheduler -> ArtifactBuilder : buildArtifact(Function F, \nPrivateData PD, \nContract Cd, Contract Cf, \nConsent Cons(F on PD), \nAccessToken T)
+ArtifactBuilder -> ConnectorEdge : requestFunction(Function F)
+ConnectorEdge -> Catalog : getAccessInfo(Function F)
+Catalog -> ConnectorEdge : ID of FunctionProvider, AccessInfo of its Connector
+
+ConnectorEdge -> ConnectorFP : requestFunction(Function F, Contract Cf)
+ConnectorFP -> Contract : verifyContract(Contract Cf)
+Contract -> ConnectorFP : OK
+ConnectorFP -> FunctionProvider : getFunction(\nFunction F)
+FunctionProvider -> ConnectorFP : function f
+ConnectorFP -> ConnectorEdge : function f
+
+ConnectorEdge -> ArtifactBuilder : function f
+ArtifactBuilder -> Scheduler : done, Artifact A
+Scheduler -> Scheduler : schedule(Artifact A)
+Scheduler -> WorkerNode : deployArtifact(Artifact A)
+
+== Executing the Function on Private Data ==
+WorkerNode -> Wrapper : init(Artifact A)
+activate Wrapper
+Wrapper -> ConnectorEdge : requestData/wPrivacyPreserving(PrivateData PD,\nContract Cd, Consent Cons(F on PD), AccessToken T)
+ConnectorEdge -> ConnectorDP : requestData/wPrivacyPreserving(PrivateData PD, Contract Cd, Consent Cons(F on PD))
+
+ConnectorDP -> Contract : verifyContract(Contract Cd)
+Contract -> ConnectorDP : OK
+ConnectorDP -> Consent : verifyConsent(Consent Cons(F on PD))
+Consent -> ConnectorDP : OK
+ConnectorDP -> DataProvider : getData(\nPrivateData PD)
+DataProvider -> ConnectorDP : pdata pd
+
+ConnectorDP -> ConnectorEdge : pdata pd (privacy preserving sending of PrivateData)
+ConnectorEdge -> Wrapper : pdata pd (privacy preserving sending of PrivateData)
+Wrapper -> Wrapper : execute(function f)
+Wrapper -> EdgeAPI : Result R
+destroy Wrapper
+EdgeAPI -> TriggeringBB : Result R
+
+@enduml
+

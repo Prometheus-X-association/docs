@@ -1,0 +1,410 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Prometheus-X Catalog Registry",
+    "version": "0.1.0",
+    "description": "This component allows your catalog instance to easily access standard descriptions of datasets, services, roles, obligations and business models. You don't have to invent them yourself and you can describe your ecosystem quickly and in a standardised way!"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/v1",
+      "description": "API Server"
+    }
+  ],
+  "paths": {
+    "/references": {
+      "get": {
+        "summary": "Get all references",
+        "description": "Retrieve the list of all references from the catalog registry instance",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reference"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/references/{type}": {
+      "get": {
+        "summary": "Get references by type",
+        "description": "Retrieve the list of references by type from the catalog registry instance",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "description": "Type of the reference",
+            "schema": {
+              "$ref": "#/components/schemas/ReferenceType"
+            }
+          },
+          {
+            "name": "populate",
+            "in": "query",
+            "required": false,
+            "description": "populate relationships",
+            "schema": {
+              "$ref": "#/components/schemas/ReferencePopulate"
+              }
+            }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reference"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new reference",
+        "description": "Create a new reference of the specified type",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "description": "Type of the reference",
+            "schema": {
+              "$ref": "#/components/schemas/ReferenceType"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "descriptions": {
+                    "description": "Description of the reference",
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/LanguageValue"
+                    }
+                  },
+                  "definitions": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/LanguageValue"
+                    }
+                  },
+                  "roleDefinitions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "responsibilitiesAndObligations": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["title"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reference"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/references/{type}/{fileName}": {
+      "get": {
+        "summary": "Get reference by type and file name",
+        "description": "Retrieve the jsonld of a reference",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "description": "Type of the reference",
+            "schema": {
+              "$ref": "#/components/schemas/ReferenceType"
+            }
+          },
+          {
+            "name": "fileName",
+            "in": "path",
+            "required": true,
+            "description": "File name",
+            "schema": {
+              "$ref": "#/components/schemas/FileName"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Jsonld"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs": {
+      "get": {
+        "summary": "Get all jobs configuration",
+        "description": "Retrieve the list of all job configuration",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobConfiguration"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jobs/{job}": {
+      "get": {
+        "summary": "Get job configuration by job name",
+        "description": "Retrieve a job configuration by job name",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "Name of the job",
+            "schema": {
+              "$ref": "#/components/schemas/JobName"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobConfiguration"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a job configuration",
+        "description": "Update the frequency and the scheduling of a job",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job",
+            "in": "path",
+            "required": true,
+            "description": "Name of the job",
+            "schema": {
+              "$ref": "#/components/schemas/JobName"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "scheduled": {
+                    "description": "Enable or disable the scheduling of the job",
+                    "type": "boolean"
+                  },
+                  "frequency": {
+                    "description": "Frequency of the scheduled job",
+                    "type": "string",
+                    "items": {
+                      "$ref": "#/components/schemas/FrequencyValue"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobConfiguration"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "ReferenceType": {
+        "type": "string",
+        "description": "An available reference type",
+        "enum": [
+          "architecture",
+          "building-block",
+          "business-model",
+          "decision-process",
+          "direction",
+          "perimeter",
+          "pricing-model",
+          "requirement",
+          "roles",
+          "value-sharing"
+        ]
+      },
+      "Reference": {
+        "type": "object",
+        "description": "A reference model defined by Prometheus-X or users",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ReferenceType"
+          },
+          "refURL": {
+            "description": "The Prometheus-X reference URL. If the field is null or empty, then it is not a Prometheus-X defined reference.",
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "The name of the reference"
+          },
+          "jsonld": {
+            "description": "The full JSON-LD structure of the reference. Contains additional information than the base model.",
+            "type": "string"
+          }
+        }
+      },
+      "LanguageValue": {
+        "type": "object",
+        "description": "A JSON-LD object used for stating something in multiple languages.",
+        "properties": {
+          "@language": {
+            "description": "A valid ISO 639-1 language code",
+            "type": "string"
+          },
+          "@value": {
+            "description": "The string value for the corresponding language",
+            "type": "string"
+          }
+        }
+      },
+      "JobName": {
+        "type": "string",
+        "description": "An available job Configuration",
+        "enum": [
+          "dbUpdateJob"
+        ]
+      },
+      "JobConfiguration": {
+        "type": "object",
+        "description": "A job configuration",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/JobName"
+          },
+          "scheduled": {
+            "description": "a boolean that enable or disable the scheduling of the job",
+            "type": "boolean"
+          },
+          "frequency": {
+            "$ref": "#/components/schemas/FrequencyValue"
+          }
+        }
+      },
+      "FrequencyValue": {
+        "type": "string",
+        "description": "A enum of available frequency of jobs scheduling.",
+        "enum": [
+          "DAILY",
+          "WEEKLY",
+          "MONTHLY",
+          "ANNUALLY"
+        ]
+      },
+      "ReferencePopulate": {
+        "type": "boolean",
+        "description": "Boolean to populate or not the relationships"
+      },
+      "FileName": {
+        "type": "string",
+        "description": "File name of the reference"
+      },
+      "Jsonld": {
+        "type": "object",
+        "description": "A jsonld parsed of a reference"
+      }
+    }
+  }
+}
