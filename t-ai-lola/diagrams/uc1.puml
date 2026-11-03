@@ -1,0 +1,24 @@
+@startuml
+title Accounting
+left to right direction
+rectangle Platform {
+(Validate an account) as v
+(Create an account) as c
+(Access to only public content) <<Profile#1>> as p1
+(Dataset management and public scenario) <<Profile#2>> as p2
+(Data sharing and analytics) <<Profile#3>> as p3
+(Scenario, algorithms and indicators) <<Profile#4>> as p4
+(Creation of meta-scenario) <<Profile#5>> as p5
+
+}
+actor Admin as a
+actor User as u
+u-->c
+a-->v
+p1-|>c
+p2-|>c
+p3-|>c
+p4-|>c
+p5-|>c
+
+@enduml
