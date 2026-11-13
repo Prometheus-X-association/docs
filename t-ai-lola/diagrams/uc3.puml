@@ -1,0 +1,29 @@
+@startuml
+
+
+title Auditing an algorithm
+
+rectangle Local {
+(get the template of targeted scenario) as gtts
+(tune algorithm) as ta
+gtts-[hidden]-ta
+}
+
+rectangle Platform {
+(upload algorithm) as ua
+(monitor execution) as me
+(download report) as dr
+}
+Local-[hidden]-Platform
+ua-[hidden]-me
+me-[hidden]-dr
+
+actor Challenger as c
+c-->gtts
+c-->ta
+c-->ua
+c-->me
+c-->dr
+
+
+@enduml

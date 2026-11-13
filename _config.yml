@@ -1,0 +1,6 @@
+# Site settings
+title: Prometheus-X Components & Services
+baseurl: "/docs/" # the subpath of your site, e.g. /blog/
+
+# Build settings
+markdown: GFM
