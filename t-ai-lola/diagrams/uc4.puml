@@ -1,0 +1,30 @@
+@startuml
+
+
+title Designing a scenario
+
+rectangle Local {
+(design the experimental protocol) as dep
+(implement the protocol) as ip
+(develop baseline algorithm) as dba
+dep-[hidden]-ip
+ip-[hidden]-dba
+}
+
+rectangle Platform {
+(upload scenario) as us
+(configure scenario) as cs
+}
+us-[hidden]-cs
+
+
+actor ScenarioDesigner as sd
+sd-->dep
+sd-->ip
+sd-->dba
+sd-->us
+sd-->cs
+
+
+
+@enduml

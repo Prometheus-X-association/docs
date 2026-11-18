@@ -1,0 +1,3100 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Prometheus-X Catalog API",
+    "version": "0.1.0",
+    "description": "A component to manage and browse ecosystems, service offerings and data resources on the catalog."
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Authentication"
+    },
+    {
+      "name": "Data Resources",
+      "description": "Endpoints to manage data assets & resources"
+    },
+    {
+      "name": "Software Resources",
+      "description": "Endpoints to manage software resources"
+    },
+    {
+      "name": "Service Offerings",
+      "description": "Endpoints to manage service offerings"
+    },
+    {
+      "name": "Ecosystems",
+      "description": "Endpoints related to ecosystems"
+    },
+    {
+      "name": "Negotiation",
+      "description": "Endpoints related to management of negotiation on service offerings"
+    },
+    {
+      "name": "Representations",
+      "description": "Endpoints related to management of representation on data resource and software resource"
+    },
+    {
+      "name": "Infrastructure Services",
+      "description": "Endpoints to manage infrastructure services"
+    }
+  ],
+  "paths": {
+    "/dataresources": {
+      "get": {
+        "summary": "Retrieves Data resources with pagination",
+        "tags": [
+          "Data Resources"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 10
+            },
+            "description": "Number of items to return per page"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "offeredBy",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Filter by Participant IDs offering the data (comma-separated)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "limit": {
+                          "type": "number"
+                        },
+                        "page": {
+                          "type": "number"
+                        },
+                        "pages": {
+                          "type": "number"
+                        },
+                        "result": {
+                          "type": "object",
+                          "ref": "#/Components/schemas/DataResource"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates a new data resource for the authenticated participant",
+        "tags": [
+          "Data Resources"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataResource"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response with the created Data Resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dataresources/{id}": {
+      "get": {
+        "summary": "Retrieves a single Data resource by its ID",
+        "tags": [
+          "Data Resources"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Data resource to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Data resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data resource not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Updates a data resource by its ID",
+        "tags": [
+          "Data Resources"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Data resource to update"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataResource"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with the updated Data resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data resource not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes a data resource by its ID",
+        "tags": [
+          "Data Resources"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Data resource to delete"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the deleted Data offering",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data offering not found"
+          }
+        }
+      }
+    },
+    "/dataresources/me": {
+      "get": {
+        "summary": "Retrieves Data resources of the logged in user",
+        "tags": [
+          "Data Resources"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Data resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DataResource"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/softwareresources": {
+      "get": {
+        "summary": "Retrieves software resources with pagination",
+        "tags": [
+          "Software Resources"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 10
+            },
+            "description": "Number of items to return per page"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "offeredBy",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Filter by Participant IDs offering the data (comma-separated)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "limit": {
+                          "type": "number"
+                        },
+                        "page": {
+                          "type": "number"
+                        },
+                        "pages": {
+                          "type": "number"
+                        },
+                        "result": {
+                          "type": "object",
+                          "ref": "#/Components/schemas/SoftwareResource"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates a new Software resource for the authenticated participant",
+        "tags": [
+          "Software Resources"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SoftwareResource"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response with the created Software Resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoftwareResource"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/softwareresources/{id}": {
+      "get": {
+        "summary": "Retrieves a single Software resource by its ID",
+        "tags": [
+          "Software Resources"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Software resource to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Software resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoftwareResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data resource not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Updates a Software resource by its ID",
+        "tags": [
+          "Software Resources"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Software resource to update"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SoftwareResource"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with the updated Software resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoftwareResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Software resource not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes a Software resource by its ID",
+        "tags": [
+          "Software Resources"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Software resource to delete"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the deleted Software offering",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoftwareResource"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data offering not found"
+          }
+        }
+      }
+    },
+    "/softwareresources/me": {
+      "get": {
+        "summary": "Retrieves Software resources of the logged in user",
+        "tags": [
+          "Software Resources"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Software resources",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SoftwareResource"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/serviceofferings": {
+      "get": {
+        "summary": "Retrieves Service offerings with pagination",
+        "tags": [
+          "Service Offerings"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 10
+            },
+            "description": "Number of items to return per page"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "offeredBy",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Filter by Participant IDs offering the data (comma-separated)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "limit": {
+                          "type": "number"
+                        },
+                        "page": {
+                          "type": "number"
+                        },
+                        "pages": {
+                          "type": "number"
+                        },
+                        "result": {
+                          "type": "object",
+                          "ref": "#/Components/schemas/ServiceOffering"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates a new Service Offering for the authenticated participant",
+        "tags": [
+          "Service Offerings"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceOffering"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response with the created Service Offering",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceOffering"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/serviceofferings/{id}": {
+      "get": {
+        "summary": "Retrieves a single Service Offering by its ID",
+        "tags": [
+          "Service Offerings"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Service Offering to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Service Offering",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceOffering"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data resource not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Updates a Service Offering by its ID",
+        "tags": [
+          "Service Offerings"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Service Offering to update"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceOffering"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with the updated Service Offering",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceOffering"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Service Offering not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes a Service Offering by its ID",
+        "tags": [
+          "Service Offerings"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Service Offering to delete"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the deleted Service Offering",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceOffering"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data offering not found"
+          }
+        }
+      }
+    },
+    "/serviceofferings/me": {
+      "get": {
+        "summary": "Retrieves Service Offerings of the logged in user",
+        "tags": [
+          "Service Offerings"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Service Offerings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceOffering"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login",
+        "requestBody": {
+          "description": "Credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "JWT bearer token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Signup",
+        "requestBody": {
+          "description": "Credentials",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "participantName": {
+                    "type": "string",
+                    "description": "Name of the Participant / Organization to sign up"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Registration"
+          }
+        }
+      }
+    },
+    "/negotiation": {
+      "get": {
+        "tags": [
+          "Negotiation"
+        ],
+        "summary": "Get My Exchange Configurations",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeConfiguration"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Negotiation"
+        ],
+        "summary": "Create Service Offering Access Request",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "provider": {
+                    "type": "string"
+                  },
+                  "consumer": {
+                    "type": "string"
+                  },
+                  "providerServiceOffering": {
+                    "type": "string"
+                  },
+                  "consumerServiceOffering": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "provider",
+                  "consumer",
+                  "providerServiceOffering",
+                  "consumerServiceOffering"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeConfiguration"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/negotiation/{id}": {
+      "get": {
+        "tags": [
+          "Negotiation"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get Exchange Configuration by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeConfiguration"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Negotiation"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Authorize Exchange Configuration",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "policy": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "required": [
+                  "policy"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeConfiguration"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/negotiation/{id}/negotiate": {
+      "put": {
+        "tags": [
+          "Negotiation"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Negotiate Exchange Configuration Policy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "policy": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  }
+                },
+                "required": [
+                  "policy"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeConfiguration"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/negotiation/{id}/accept": {
+      "put": {
+        "tags": [
+          "Negotiation"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Accept Negotiation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeConfiguration"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/negotiation/{id}/sign": {
+      "put": {
+        "tags": [
+          "Negotiation"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Sign Exchange Configuration",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "signature": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "signature"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeConfiguration"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ecosystems": {
+      "get": {
+        "summary": "Retrieves ecosystems with pagination",
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 10
+            },
+            "description": "Number of items to return per page"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "offeredBy",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Filter by Participant IDs included in Ecosystems (comma-separated)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "limit": {
+                          "type": "number"
+                        },
+                        "page": {
+                          "type": "number"
+                        },
+                        "pages": {
+                          "type": "number"
+                        },
+                        "result": {
+                          "type": "object",
+                          "ref": "#/Components/schemas/Ecosystem"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates a new Ecosystem with the authenticated participant as orchestrator",
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ecosystem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response with the created Ecosystem",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ecosystem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}": {
+      "get": {
+        "summary": "Retrieves a single Ecosystem by its ID",
+        "tags": [
+          "Ecosystems"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Ecosystem to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Ecosystem",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ecosystem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ecosystem not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Updates a Ecosystem by its ID",
+        "tags": [
+          "Ecosystems"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Ecosystem to update"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ecosystem"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with the updated Ecosystem",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ecosystem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ecosystem not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes a Ecosystem by its ID",
+        "tags": [
+          "Ecosystems"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Ecosystem to delete"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the deleted Ecosystem",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ecosystem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Ecosystem not found"
+          }
+        }
+      }
+    },
+    "/ecosystems/me": {
+      "get": {
+        "summary": "Retrieves Ecosystems of the logged in user",
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Ecosystems",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ecosystem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ecosystems/me/invites": {
+      "get": {
+        "summary": "Retrieves invitations of the logged in user to ecosystems",
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Ecosystems",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ecosystem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/invites": {
+      "get": {
+        "summary": "Retrieves invitations of the ecosystem",
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Invitations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "participant": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Negotiation"
+        ],
+        "summary": "Create an invitation to an ecosystem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "participantId": {
+                    "type": "string",
+                    "description": "The participant ID to invite"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/invites/accept": {
+      "post": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Accepts an invitation to an ecosystem",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/invites/deny": {
+      "post": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Denies an invitation to an ecosystem",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/requests": {
+      "post": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Creates a request to join an ecosystem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "offerings": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/EcosystemOfferingPolicy"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/requests/{requestId}/authorize": {
+      "put": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Authorizes a join request made to an ecosystem",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/requests/{requestId}/reject": {
+      "put": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Rejects a join request made to an ecosystem",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/offerings": {
+      "put": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Configure the offerings for a participant in an ecosystem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "offerings": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/EcosystemOfferingPolicy"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/contract": {
+      "get": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Retrieve contract for the ecosystem. The format of the contract is defined in the Prometheus-X Contract Manager repository",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Create a contract for the ecosystem. This endpoint is only used if an ecosystem was created and the contract auto-generation failed.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/signature/orchestrator": {
+      "post": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Apply orchestrator signature on the ecosystem.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "signature": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/signature/participant": {
+      "post": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Apply participant signature on the ecosystem.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "signature": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/representations": {
+      "post": {
+        "summary": "Creates a new Representation for the authenticated participant",
+        "tags": [
+          "Representations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Representation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response with the created Representation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Representation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Wrong URL format"
+          }
+        }
+      }
+    },
+    "/representations/{id}": {
+      "get": {
+        "summary": "Retrieves a single Representation by its ID",
+        "tags": [
+          "Representations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Representation to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Representation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Representation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Representation not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Updates a representation by its ID",
+        "tags": [
+          "Representations"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the representation to update"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Representation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with the updated Representation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Representation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Wrong URL format"
+          },
+          "404": {
+            "description": "Representation not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes a Representation by its ID",
+        "tags": [
+          "Representations"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Representation to delete"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the deleted Representation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Representation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Representation not found"
+          }
+        }
+      }
+    },
+    "/infrastructureservices": {
+      "post": {
+        "summary": "Creates a new infrastructure service for the authenticated participant",
+        "tags": [
+          "Infrastructure Services"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InfrastructureService"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response with the created Infrastructure Service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfrastructureService"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Retrieves Infrastructure services with pagination",
+        "tags": [
+          "Infrastructure Services"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 10
+            },
+            "description": "Number of items to return per page"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "Page number for pagination"
+          },
+          {
+            "in": "query",
+            "name": "providedBy",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by provider ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "limit": {
+                          "type": "number"
+                        },
+                        "page": {
+                          "type": "number"
+                        },
+                        "pages": {
+                          "type": "number"
+                        },
+                        "result": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/InfrastructureService"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/infrastructureservices/draft": {
+      "post": {
+        "summary": "Creates a draft infrastructure service",
+        "tags": [
+          "Infrastructure Services"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InfrastructureService"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response with the created draft Infrastructure Service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfrastructureService"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/infrastructureservices/me": {
+      "get": {
+        "summary": "Retrieves Infrastructure services of the logged in user",
+        "tags": [
+          "Infrastructure Services"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Infrastructure services",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InfrastructureService"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/infrastructureservices/{id}": {
+      "get": {
+        "summary": "Retrieves a single Infrastructure service by its ID",
+        "tags": [
+          "Infrastructure Services"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Infrastructure service to retrieve"
+          },
+          {
+            "in": "query",
+            "name": "populated",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Whether to populate related fields"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Infrastructure service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfrastructureService"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Infrastructure service not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Updates an Infrastructure service by its ID",
+        "tags": [
+          "Infrastructure Services"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Infrastructure service to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InfrastructureService"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with the updated Infrastructure service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InfrastructureService"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Infrastructure service not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes an Infrastructure service by its ID",
+        "tags": [
+          "Infrastructure Services"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the Infrastructure service to delete"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Infrastructure service successfully deleted"
+          },
+          "404": {
+            "description": "Infrastructure service not found"
+          }
+        }
+      }
+    },
+    "/infrastructureservices/participant/{id}": {
+      "get": {
+        "summary": "Retrieves Infrastructure services for a specific participant",
+        "tags": [
+          "Infrastructure Services"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the participant"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the Infrastructure services",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InfrastructureService"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/addinfrastructureservices": {
+      "post": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "summary": "Add infrastructure services to an ecosystem",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the ecosystem"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "infrastructureServices": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of infrastructure service IDs"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Infrastructure services successfully added to ecosystem",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ecosystem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/signature/infrastructureprovider": {
+      "post": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "summary": "Apply infrastructure provider signature on the ecosystem",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the ecosystem"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "signature": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "signature"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signature successfully applied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/adddataprocessingchain": {
+      "post": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "summary": "Add a data processing chain to an ecosystem",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the ecosystem"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dataProcessingChain": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "participant": {
+                          "type": "string",
+                          "description": "ID of the participant"
+                        },
+                        "resource": {
+                          "type": "string",
+                          "description": "ID of the service offering or infrastructure service"
+                        },
+                        "configuration": {
+                          "type": "string"
+                        },
+                        "params": {
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "participant",
+                        "resource"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "dataProcessingChain"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data processing chain successfully added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ecosystem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/updatedataprocessingchain/{chainId}": {
+      "put": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "summary": "Update a data processing chain in an ecosystem",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the ecosystem"
+          },
+          {
+            "in": "path",
+            "name": "chainId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the data processing chain"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dataProcessingChain": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "participant": {
+                          "type": "string",
+                          "description": "ID of the participant"
+                        },
+                        "resource": {
+                          "type": "string",
+                          "description": "ID of the service offering or infrastructure service"
+                        },
+                        "configuration": {
+                          "type": "string"
+                        },
+                        "params": {
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "participant",
+                        "resource"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "dataProcessingChain"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data processing chain successfully updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ecosystem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ecosystems/{id}/{chainId}": {
+      "delete": {
+        "tags": [
+          "Ecosystems"
+        ],
+        "summary": "Delete a data processing chain from an ecosystem",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the ecosystem"
+          },
+          {
+            "in": "path",
+            "name": "chainId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the data processing chain to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data processing chain successfully deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ecosystem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "DataResource": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "aggregationOf": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "copyrightOwnedBy": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "license": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "policy": {
+            "type": "array",
+            "items": {}
+          },
+          "producedBy": {
+            "type": "string"
+          },
+          "exposedThrough": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "obsoleteDateTime": {
+            "type": "string",
+            "default": ""
+          },
+          "expirationDateTime": {
+            "type": "string",
+            "default": ""
+          },
+          "containsPII": {
+            "type": "boolean"
+          },
+          "category": {
+            "type": "string",
+            "default": ""
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "producedBy",
+          "containsPII"
+        ]
+      },
+      "SoftwareResource": {
+        "type": "object",
+        "properties": {
+          "providedBy": {
+            "type": "string",
+            "description": "The provider of the software resource"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the software resource"
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the software resource"
+          },
+          "aggregationOf": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of aggregation values"
+          },
+          "copyrightOwnedBy": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of copyright owners"
+          },
+          "license": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of licenses"
+          },
+          "policy": {
+            "type": "array",
+            "items": {},
+            "description": "List of policies"
+          },
+          "category": {
+            "type": "string",
+            "description": "The category of the software resource"
+          },
+          "locationAddress": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "countryCode": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "List of location addresses with country codes"
+          },
+          "users_clients": {
+            "type": "integer",
+            "description": "Number of users or clients"
+          },
+          "demo_link": {
+            "type": "string",
+            "description": "Link to a demo"
+          },
+          "relevant_project_link": {
+            "type": "string",
+            "description": "Link to a relevant project"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "producedBy",
+          "containsPII"
+        ]
+      },
+      "ServiceOffering": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the service offering"
+          },
+          "providedBy": {
+            "type": "string",
+            "description": "The provider of the service offering"
+          },
+          "aggregationOf": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of aggregation values"
+          },
+          "dependsOn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of dependencies"
+          },
+          "policy": {
+            "type": "array",
+            "items": {},
+            "description": "List of policies"
+          },
+          "termsAndConditions": {
+            "type": "string",
+            "description": "Terms and conditions of the service offering",
+            "default": ""
+          },
+          "dataProtectionRegime": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of data protection regimes"
+          },
+          "dataAccountExport": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "requestType": {
+                  "type": "string",
+                  "enum": [
+                    "API",
+                    "email",
+                    "webform",
+                    "unregisteredLetter",
+                    "registeredLetter",
+                    "supportCenter"
+                  ]
+                },
+                "accessType": {
+                  "type": "string",
+                  "enum": [
+                    "digital",
+                    "physical"
+                  ]
+                },
+                "formatType": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "List of data account export configurations"
+          },
+          "location": {
+            "type": "string",
+            "description": "Location of the service offering",
+            "default": ""
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the service offering",
+            "default": ""
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of keywords"
+          },
+          "dataResources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of data resource IDs"
+          },
+          "softwareResources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of software resource IDs"
+          },
+          "compliantServiceOfferingVC": {
+            "type": "string",
+            "description": "Compliant service offering VC",
+            "default": ""
+          },
+          "serviceOfferingVC": {
+            "type": "string",
+            "description": "Service offering VC",
+            "default": ""
+          }
+        }
+      },
+      "ExchangeConfiguration": {
+        "type": "object",
+        "properties": {
+          "consumer": {
+            "type": "string",
+            "description": "The consumer in the exchange configuration"
+          },
+          "provider": {
+            "type": "string",
+            "description": "The provider in the exchange configuration"
+          },
+          "consumerServiceOffering": {
+            "type": "string",
+            "description": "The consumer service offering"
+          },
+          "providerServiceOffering": {
+            "type": "string",
+            "description": "The provider service offering"
+          },
+          "providerPolicies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ruleId": {
+                  "type": "string",
+                  "description": "The rule ID for provider policies"
+                },
+                "values": {
+                  "type": "object",
+                  "description": "Values associated with provider policies"
+                }
+              }
+            },
+            "description": "List of provider policies"
+          },
+          "consumerPolicies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ruleId": {
+                  "type": "string",
+                  "description": "The rule ID for consumer policies"
+                },
+                "values": {
+                  "type": "object",
+                  "description": "Values associated with consumer policies"
+                }
+              }
+            },
+            "description": "List of consumer policies"
+          },
+          "latestNegotiator": {
+            "type": "string",
+            "description": "The latest negotiator",
+            "default": ""
+          },
+          "signatures": {
+            "type": "object",
+            "properties": {
+              "consumer": {
+                "type": "string",
+                "description": "Consumer's signature",
+                "default": null
+              },
+              "provider": {
+                "type": "string",
+                "description": "Provider's signature",
+                "default": null
+              }
+            },
+            "description": "Signatures for consumer and provider"
+          },
+          "contract": {
+            "type": "string",
+            "description": "The contract associated with the exchange",
+            "default": null
+          },
+          "negotiationStatus": {
+            "type": "string",
+            "description": "The negotiation status",
+            "enum": [
+              "Pending",
+              "Authorized",
+              "Rejected",
+              "Signed"
+            ]
+          }
+        }
+      },
+      "Ecosystem": {
+        "type": "object",
+        "properties": {}
+      },
+      "EcosystemOfferingPolicy": {
+        "type": "object",
+        "properties": {
+          "serviceOffering": {
+            "type": "string",
+            "description": "Service Offering ID"
+          },
+          "ruleId": {
+            "type": "string",
+            "description": "Rule UID of the policy to configure on the service offering"
+          },
+          "values": {
+            "type": "object",
+            "description": "The differend values of the policy to configure based on the rule's requiredFields"
+          }
+        }
+      },
+      "Representation": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "resourceID": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "credential": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "resourceID",
+          "url"
+        ]
+      },
+      "InfrastructureService": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "providedBy": {
+            "type": "string",
+            "description": "ID of the provider participant"
+          },
+          "policy": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "location": {
+            "type": "string"
+          },
+          "params": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "inputFormat": {
+            "type": "string"
+          },
+          "outputFormat": {
+            "type": "string"
+          },
+          "dataResources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "softwareResources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "providedBy"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/v1",
+      "description": "API Server"
+    }
+  ]
+}
